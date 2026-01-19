@@ -1,0 +1,174 @@
+<!-- =========================
+ SIMPLE E-COMMERCE WEBSITE (HTML, CSS, JS)
+ Pages: Home, Products, Cart, Contact
+ Covers: headings, styles, formatting, colors, links, images, favicon,
+ page title, table, list, buttons, id, iframe, JS, layout, entities,
+ emojis, symbols, input types & attributes, form attributes,
+ canvas, SVG, Web APIs (localStorage), drag & drop (basic), web storage
+ ========================= -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"> <!-- Entities support -->
+  <title>Aysha Shop 🛒</title> <!-- Page title & Emoji -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🛍️</text></svg>"> <!-- Favicon -->
+
+  <style>
+    /* ====== GLOBAL STYLES ====== */
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#77828d;color:#333}
+    header{background:#222;color:white;padding:90px}
+    nav a{color:white;margin:0 79px;text-decoration:none;font-weight:bold}
+    nav a:hover{color:#ff9800}
+
+    .container{padding:60px}
+    h1,h2,h3{color:#222}
+
+    /* ====== LAYOUT ====== */
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:40px}
+    .card{background:white;border-radius:70px;padding:15px;box-shadow:0 10px 20px rgba(0,0,0,.1)}
+
+    /* ====== BUTTON ====== */
+    button{background:#ff9800;border:none;padding:15px 20px;border-radius:10px;color:rgb(209, 37, 37);cursor:pointer}
+    button:hover{background:#e68900}
+
+    /* ====== TABLE ====== */
+    table{width:100%;border-collapse:collapse}
+    th,td{border:3px solid #ccc;padding:8px;text-align:center}
+    th{background:#eee}
+
+    footer{background:#222;color:white;text-align:center;padding:20px;margin-top:70px}
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Aysha Online Shop 🛒</h1> <!-- Heading -->
+  <nav>
+    <!-- Links -->
+    <a href="#home">Home</a>
+    <a href="#products">Products</a>
+    <a href="#cart">Cart</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</header>
+
+<!-- ================= HOME PAGE ================= -->
+<section id="home" class="container">
+  <h2>Welcome to our Store 😊</h2>
+  <p><b>Best quality</b> products with <i>cheap price</i> &amp; fast delivery 🚚</p> <!-- Formatting + Entity -->
+
+  <!-- SVG -->
+  <svg width="200" height="100">
+    <rect width="200" height="100" fill="#ff9800" />
+    <text x="30" y="60" fill="white" font-size="34">Big Sale</text>
+  </svg>
+</section>
+
+<!-- ================= PRODUCTS PAGE ================= -->
+<section id="products" class="container">
+  <h2>Products List</h2>
+
+  <div class="grid">
+    <div class="card" draggable="true" ondragstart="drag(event)" id="p1">
+      <img src="https://images.unsplash.com/photo-1622445270936-5dcb604970e7?q=80&w=387&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Product Image"> <!-- Image -->
+      <h3>T-Shirt 👕</h3>
+      <p>Price: ৳500</p>
+      <button onclick="addToCart('T-Shirt',500)">Add to Cart</button>
+    </div>
+
+    <div class="card" draggable="true" ondragstart="drag(event)" id="p2">
+      <img src="https://images.unsplash.com/photo-1608667508764-33cf0726b13a?q=80&w=580&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Product Image">
+      <h3>Shoes 👟</h3>
+      <p>Price: ৳1200</p>
+      <button onclick="addToCart('Shoes',1200)">Add to Cart</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CART PAGE ================= -->
+<section id="cart" class="container" ondrop="drop(event)" ondragover="allowDrop(event)">
+  <h2>Your Cart 🛒</h2>
+
+  <!-- Table -->
+  <table>
+    <thead>
+      <tr><th>Product</th><th>Price</th></tr>
+    </thead>
+    <tbody id="cartData"></tbody>
+  </table>
+
+  <!-- Canvas -->
+  <h3>Total Visual</h3>
+  <canvas id="myCanvas" width="350" height="90" style="border:1px solid #ccc"></canvas>
+</section>
+
+<!-- ================= CONTACT PAGE ================= -->
+<section id="contact" class="container">
+  <h2>Contact Us 📞</h2>
+
+  <!-- List -->
+  <ul>
+    <li>Email: support@aysha.com</li>
+    <li>Phone: +880123456789</li>
+  </ul>
+
+  <!-- Form -->
+  <form onsubmit="return submitForm()">
+    <input type="text" placeholder="Your Name" required> <br><br>
+    <input type="email" placeholder="Email" required> <br><br>
+    <input type="number" placeholder="Phone" required> <br><br>
+    <textarea placeholder="Message"></textarea><br><br>
+    <button type="submit">Send</button>
+  </form>
+
+  <!-- Iframe -->
+  <h3>Our Location</h3>
+  <iframe src="https://maps.google.com/maps?q=dhaka&t=&z=13&ie=UTF8&iwloc=&output=embed" width="150%" height="250"></iframe>
+</section>
+
+<footer>
+  <p>&copy; 2026 Aysha Shop | Made with ❤️</p>
+</footer>
+
+<script>
+  // ====== JAVASCRIPT ======
+  let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+  function addToCart(name, price){
+    cart.push({name,price});
+    localStorage.setItem('cart', JSON.stringify(cart)); // Web Storage
+    showCart();
+  }
+
+  function showCart(){
+    let html="";
+    let total=0;
+    cart.forEach(item=>{
+      html+=`<tr><td>${item.name}</td><td>${item.price}</td></tr>`;
+      total+=item.price;
+    });
+    document.getElementById('cartData').innerHTML=html;
+
+    // Canvas drawing
+    let c=document.getElementById('myCanvas');
+    let ctx=c.getContext('2d');
+    ctx.clearRect(0,0,c.width,c.height);
+    ctx.fillStyle="#ff9800";
+    ctx.fillRect(0,0,total/10,50);
+    ctx.fillStyle="black";
+    ctx.fillText("Total: ৳"+total,10,70);
+  }
+
+  showCart();
+
+  // Drag & Drop
+  function allowDrop(ev){ev.preventDefault();}
+  function drag(ev){ev.dataTransfer.setData("text", ev.target.id);}
+  function drop(ev){ev.preventDefault();alert("Item dropped into cart area!");}
+
+  function submitForm(){alert("Message sent successfully 😊");return false;}
+</script>
+
+</body>
+</html>
