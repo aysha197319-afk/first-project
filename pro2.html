@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMUCT Student Attendance</title>
+<link rel="icon" href="data:image/svg+xml,
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+<text y='0.9em' font-size='150'>🎓</text>
+</svg>">
+
+<style>
+:root{
+  --main:#4d3a47;
+  --sub:#dadbe6;
+  --bg:#668586;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+body{background:var(--bg)}
+header{background:var(--main); color:rgb(255, 255, 255); padding:40px; text-align:center;}
+header img{height:50px; vertical-align:middle; margin-right:25px;}
+nav{background:var(--sub); display:flex; flex-wrap:wrap; justify-content:center;}
+nav a{color:rgb(70, 82, 75); padding:25px 45px; text-decoration:none;}
+nav a:hover{background:#797269}
+.container{padding:30px}
+.card{background:rgb(119, 98, 122); padding:30px; margin-bottom:35px; border-radius:20px; box-shadow:0 0 20px rgba(0,0,0,.1);}
+h2{color:var(--sub); margin-bottom:25px;}
+button{background:var(--sub); color:white; border:none; padding:15px 40px; border-radius:12px; cursor:pointer;}
+button:hover{background:#8b5d67}
+input,select,textarea{width:100%; padding:25px; margin:30px 0;}
+table{width:100%; border-collapse:collapse; margin-top:30px;}
+table,th,td{border:5px solid #ccc}
+th,td{text-align:center; padding:25px}
+.inline{display:inline;color:red}
+.block{display:block;margin-top:25px}
+footer{background:var(--main); color:white; text-align:center; padding:30px;}
+@media(max-width:750px){nav{flex-direction:column}}
+</style>
+</head>
+<body>
+
+<header>
+<img src="https://tse2.mm.bing.net/th/id/OIP.4FwtuIpg9yWvZTjNZ-DgkgHaFi?rs=1&pid=ImgDetMain&o=7&rm=3" alt="SMUCT Logo">
+<h1>SMUCT Student Attendance Management</h1>
+</header>
+
+<nav>
+<a href="#intro">Introduction</a>
+<a href="#student">Student</a>
+<a href="#attendance">Attendance</a>
+<a href="#canvas">Canvas</a>
+<a href="#syllabus">Syllabus</a>
+<a href="#certificate">Certificate</a>
+</nav>
+
+<div class="container">
+
+<!-- Introduction -->
+<section id="intro" class="card">
+<h2>Introduction</h2>
+<p>Welcome to <b>SMUCT</b> Student Attendance Management System.</p>
+</section>
+
+<!-- Student Form -->
+<section id="student" class="card">
+<h2>Student Registration</h2>
+<form id="studentForm">
+<input type="text" id="name" placeholder="Student Name" required>
+<input type="number" id="roll" placeholder="Roll Number" required>
+<button type="submit">Add Student</button>
+</form>
+</section>
+
+<!-- Attendance -->
+
+<html>
+<head>
+  <title>Student Attendance</title>
+</head>
+<body>
+  <h1>Attendance</h1>
+  <ul id="attendance.json"></ul>
+
+  <script src="pro.js"></script>
+</body>
+</html>
+<section id="attendance" class="card">
+<h2>Attendance</h2>
+<form id="attendanceForm">
+<select id="status">
+<option>Present</option>
+<option>Absent</option>
+</select>
+<input type="date" id="date" required>
+<button type="submit">Save Attendance</button>
+</form>
+
+<table>
+<tr>
+<th>Name</th>
+<th>Roll</th>
+<th>Status</th>
+<th>Date</th>
+<th>Attendance %</th>
+</tr>
+<tbody id="table"></tbody>
+</table>
+</section>
+
+<!-- Canvas -->
+<section id="canvas" class="card">
+<h2>Canvas & SVG</h2>
+<canvas id="myCanvas" width="320" height="120" style="border:1px solid"></canvas>
+<svg width="150" height="150">
+<circle cx="60" cy="60" r="50" fill="green"/>
+</svg>
+</section>
+
+<!-- Syllabus -->
+<section id="syllabus" class="card">
+<h2>Syllabus</h2>
+<ul>
+<li>HTML Basic</li>
+<li>Elements</li>
+<li>Attributes</li>
+<li>Forms</li>
+<li>CSS</li>
+<li>JavaScript</li>
+<li>Web APIs</li>
+</ul>
+<h3>Study Plan</h3>
+<ol>
+<li>Week 1 – HTML</li>
+<li>Week 2 – Forms</li>
+<li>Week 3 – CSS</li>
+<li>Week 4 – JavaScript</li>
+</ol>
+</section>
+
+<!-- Certificate -->
+<section id="certificate" class="card">
+<h2>Certificate</h2>
+<p>This certificate is awarded to</p>
+<h3 id="certName">_____________________</h3>
+<button id="printCert">Print Certificate</button>
+</section>
+
+</div>
+
+<footer>
+<p>&copy; 2026 SMUCT Student Attendance</p>
+</footer>
+
+<script>
+// ================= JS FUNCTIONALITY =================
+let student = {};
+let attendanceCount = {present:0, total:0};
+
+document.getElementById("studentForm").addEventListener("submit", e=>{
+    e.preventDefault();
+    student.name = document.getElementById("name").value;
+    student.roll = document.getElementById("roll").value;
+    alert("Student Added Successfully");
+    document.getElementById("studentForm").reset();
+});
+
+document.getElementById("attendanceForm").addEventListener("submit", e=>{
+    e.preventDefault();
+    const status = document.getElementById("status").value;
+    const date = document.getElementById("date").value;
+
+    attendanceCount.total++;
+    if(status === "Present") attendanceCount.present++;
+
+    const percentage = ((attendanceCount.present/attendanceCount.total)*100).toFixed(2) + "%";
+
+    const row = `<tr>
+    <td>${student.name}</td>
+    <td>${student.roll}</td>
+    <td>${status}</td>
+    <td>${date}</td>
+    <td>${percentage}</td>
+    </tr>`;
+    document.querySelector("#table").innerHTML += row;
+    document.getElementById("certName").textContent = student.name;
+    document.getElementById("attendanceForm").reset();
+});
+
+// Canvas
+const c = document.getElementById("myCanvas");
+const ctx = c.getContext("2d");
+ctx.font = "46px Arial";
+ctx.fillText("SMUCT Attendance", 40, 70);
+
+// Local Storage
+localStorage.setItem("project", "SMUCT Attendance");
+
+// Geolocation
+if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(p=>{
+        console.log("Latitude:", p.coords.latitude, "Longitude:", p.coords.longitude);
+    });
+}
+
+// Print Certificate
+document.getElementById("printCert").addEventListener("click", ()=>{
+    const certContent = document.getElementById("certificate").innerHTML;
+    const newWin = window.open('', '', 'width=700,height=500');
+    newWin.document.write(`<html><head><title>Certificate</title></head><body>${certContent}</body></html>`);
+    newWin.document.close();
+    newWin.print();
+});
+</script>
+
+</body>
+<ul id="attendance.json"></ul>
+<script src="pro.js"></script>
+
+</html>
