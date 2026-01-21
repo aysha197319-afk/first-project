@@ -56,68 +56,205 @@ footer{background:var(--main); color:white; text-align:center; padding:30px;}
 
 <div class="container">
 
-<!-- Introduction -->
+
 <section id="intro" class="card">
 <h2>Introduction</h2>
 <p>Welcome to <b>SMUCT</b> Student Attendance Management System.</p>
 </section>
 
-<!-- Student Form -->
 <section id="student" class="card">
 <h2>Student Registration</h2>
+
 <form id="studentForm">
-<input type="text" id="name" placeholder="Student Name" required>
-<input type="number" id="roll" placeholder="Roll Number" required>
-<button type="submit">Add Student</button>
+    <input type="text" id="name" placeholder="Student Name" required>
+    <input type="number" id="roll" placeholder="Roll Number" required>
+
+    <button type="submit">Register Student</button>
 </form>
+
+<p id="msg" style="color:#fff;margin-top:15px;"></p>
 </section>
 
-<!-- Attendance -->
 
-<html>
-<head>
-  <title>Student Attendance</title>
-</head>
-<body>
-  <h1>Attendance</h1>
-  <ul id="attendance.json"></ul>
+<script>
+document.getElementById("studentForm").addEventListener("submit", function(e){
+    e.preventDefault(); // Page reload বন্ধ করবে
 
-  <script src="pro.js"></script>
-</body>
-</html>
+    // Input value গুলো নাও
+    let name = document.getElementById("name").value.trim();
+    let roll = document.getElementById("roll").value.trim();
+
+    if(name === "" || roll === ""){
+        alert("Please fill all fields!");
+        return;
+    }
+
+    // ✅ Save student data in localStorage
+    localStorage.setItem("studentName", name);
+    localStorage.setItem("studentRoll", roll);
+
+    // Success message
+    document.getElementById("msg").innerHTML =
+        "✅ Registration Successful! Redirecting to Attendance...";
+
+    // 0.8 second পরে attendance section এ redirect
+    setTimeout(()=>{
+        window.location.href = "#attendance"; // অথবা অন্য page হলে: attendance.html
+    }, 800);
+});
+</script>
+
+
+<!-- Attendance Section HTML -->
 <section id="attendance" class="card">
-<h2>Attendance</h2>
-<form id="attendanceForm">
-<select id="status">
-<option>Present</option>
-<option>Absent</option>
-</select>
-<input type="date" id="date" required>
-<button type="submit">Save Attendance</button>
-</form>
+    <h2>Attendance</h2>
+    <form id="attendanceForm">
+        <select id="status">
+            <option>Present</option>
+            <option>Absent</option>
+        </select>
+        <input type="date" id="date" required>
+        <button type="submit">Save Attendance</button>
+    </form>
 
-<table>
-<tr>
-<th>Name</th>
-<th>Roll</th>
-<th>Status</th>
-<th>Date</th>
-<th>Attendance %</th>
-</tr>
-<tbody id="table"></tbody>
-</table>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Roll</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Attendance %</th>
+        </tr>
+        <tbody id="table"></tbody>
+    </table>
 </section>
 
-<!-- Canvas -->
-<section id="canvas" class="card">
-<h2>Canvas & SVG</h2>
-<canvas id="myCanvas" width="320" height="120" style="border:1px solid"></canvas>
-<svg width="150" height="150">
-<circle cx="60" cy="60" r="50" fill="green"/>
-</svg>
-</section>
+<!-- JS Code -->
+<script>
+let attendanceCount = { present: 0, total: 0 };
 
-<!-- Syllabus -->
+document.getElementById("attendanceForm").addEventListener("submit", function(e){
+    e.preventDefault(); // form reload বন্ধ করবে
+
+    // Student check
+    let student = {
+        name: localStorage.getItem("studentName"),
+        roll: localStorage.getItem("studentRoll")
+    };
+
+    if(!student.name || !student.roll){
+        alert("Please register student first!");
+        return;
+    }
+
+    // Form data
+    const status = document.getElementById("status").value;
+    const date = document.getElementById("date").value;
+
+    if(!date){
+        alert("Please select a date!");
+        return;
+    }
+
+    // Attendance calculation
+    attendanceCount.total++;
+    if(status === "Present") attendanceCount.present++;
+
+    const percentage = ((attendanceCount.present / attendanceCount.total) * 100).toFixed(2) + "%";
+
+    // Table update
+    const row = `<tr>
+        <td>${student.name}</td>
+        <td>${student.roll}</td>
+        <td>${status}</td>
+        <td>${date}</td>
+        <td>${percentage}</td>
+    </tr>`;
+
+    document.querySelector("#table").innerHTML += row;
+
+    // Certificate update
+    document.getElementById("certName").textContent = student.name;
+
+    // Reset form
+    this.reset();
+});
+</script>
+
+
+
+
+
+
+
+<script>
+// Canvas JS code এখানে
+const canvas = document.getElementById("attendanceCanvas");
+const ctx = canvas.getContext("2d");
+
+// Attendance data
+let attendanceCount = JSON.parse(localStorage.getItem("attendanceCount")) || {present:0, total:0};
+
+// Draw function
+function drawCanvas(present, total){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    const percent = total ? present/total : 0;
+
+    // Background circle
+    ctx.beginPath();
+    ctx.arc(125,125,100,0,2*Math.PI);
+    ctx.fillStyle="#555";
+    ctx.fill();
+
+    // Attendance circle
+    ctx.beginPath();
+    ctx.moveTo(125,125);
+    ctx.arc(125,125,100,-0.5*Math.PI, (-0.5 + 2*percent)*Math.PI);
+    ctx.fillStyle="#4CAF50";
+    ctx.fill();
+
+    // Inner circle for donut style
+    ctx.beginPath();
+    ctx.arc(125,125,70,0,2*Math.PI);
+    ctx.fillStyle="#333";
+    ctx.fill();
+
+    // Text
+    ctx.fillStyle="#fff";
+    ctx.font="24px Arial";
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+    ctx.fillText(`${(percent*100).toFixed(2)}%`,125,125);
+}
+
+// Initial draw
+drawCanvas(attendanceCount.present, attendanceCount.total);
+
+// Button click event
+document.getElementById("attendanceBtn").addEventListener("click", ()=>{
+    const status = prompt("Enter Status (Present/Absent)").trim();
+    if(status !== "Present" && status !== "Absent"){ alert("Please type Present or Absent"); return; }
+
+    attendanceCount.total++;
+    if(status === "Present") attendanceCount.present++;
+
+    localStorage.setItem("attendanceCount", JSON.stringify(attendanceCount));
+    drawCanvas(attendanceCount.present, attendanceCount.total);
+});
+</script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
 <section id="syllabus" class="card">
 <h2>Syllabus</h2>
 <ul>
@@ -138,7 +275,7 @@ footer{background:var(--main); color:white; text-align:center; padding:30px;}
 </ol>
 </section>
 
-<!-- Certificate -->
+
 <section id="certificate" class="card">
 <h2>Certificate</h2>
 <p>This certificate is awarded to</p>
@@ -153,7 +290,7 @@ footer{background:var(--main); color:white; text-align:center; padding:30px;}
 </footer>
 
 <script>
-// ================= JS FUNCTIONALITY =================
+
 let student = {};
 let attendanceCount = {present:0, total:0};
 
@@ -187,23 +324,23 @@ document.getElementById("attendanceForm").addEventListener("submit", e=>{
     document.getElementById("attendanceForm").reset();
 });
 
-// Canvas
+
 const c = document.getElementById("myCanvas");
 const ctx = c.getContext("2d");
 ctx.font = "46px Arial";
 ctx.fillText("SMUCT Attendance", 40, 70);
 
-// Local Storage
+
 localStorage.setItem("project", "SMUCT Attendance");
 
-// Geolocation
+
 if(navigator.geolocation){
     navigator.geolocation.getCurrentPosition(p=>{
         console.log("Latitude:", p.coords.latitude, "Longitude:", p.coords.longitude);
     });
 }
 
-// Print Certificate
+
 document.getElementById("printCert").addEventListener("click", ()=>{
     const certContent = document.getElementById("certificate").innerHTML;
     const newWin = window.open('', '', 'width=700,height=500');
@@ -214,7 +351,15 @@ document.getElementById("printCert").addEventListener("click", ()=>{
 </script>
 
 </body>
-<ul id="attendance.json"></ul>
-<script src="pro.js"></script>
+
+<body>
+  
+  <ul id="attendanceList"></ul>
+
+  <script src="pro.js"></script>
+</body>
+
+
+
 
 </html>
